@@ -1,6 +1,6 @@
 'use client';
 
-import { Container, Grid, Paper, Typography, Box, Button, Avatar } from '@mui/material';
+import { Container, Box, Paper, Typography, Button, Avatar } from '@mui/material';
 
 export default function ProfilePage() {
   // Mock user data
@@ -25,53 +25,52 @@ export default function ProfilePage() {
   };
 
   return (
-    <Container maxWidth="lg" className="py-12">
-      <Grid container spacing={4}>
-        <Grid item xs={12} md={4}>
-          <Paper elevation={3} className="p-6">
-            <Box className="flex flex-col items-center">
+    <Container maxWidth="lg" sx={{ py: 6 }}>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(12, 1fr)' }, gap: 4 }}>
+        <Box sx={{ gridColumn: { md: 'span 4' } }}>
+          <Paper elevation={3} sx={{ p: 3 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <Avatar
                 src={user.avatar}
                 alt={user.name}
-                sx={{ width: 120, height: 120 }}
-                className="mb-4"
+                sx={{ width: 120, height: 120, mb: 2 }}
               />
-              <Typography variant="h4" component="h1" className="mb-2">
+              <Typography variant="h4" component="h1" sx={{ mb: 1 }}>
                 {user.name}
               </Typography>
-              <Typography variant="body1" color="text.secondary" className="mb-4">
+              <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
                 {user.email}
               </Typography>
               <Button
                 variant="outlined"
                 color="primary"
                 fullWidth
-                className="mb-4"
+                sx={{ mb: 2 }}
               >
                 Edit Profile
               </Button>
             </Box>
           </Paper>
-        </Grid>
+        </Box>
 
-        <Grid item xs={12} md={8}>
-          <Paper elevation={3} className="p-6 mb-4">
-            <Typography variant="h5" className="mb-4">
+        <Box sx={{ gridColumn: { md: 'span 8' } }}>
+          <Paper elevation={3} sx={{ p: 3, mb: 2 }}>
+            <Typography variant="h5" sx={{ mb: 2 }}>
               About
             </Typography>
-            <Typography variant="body1" className="mb-6">
+            <Typography variant="body1" sx={{ mb: 3 }}>
               {user.bio}
             </Typography>
 
-            <Typography variant="h5" className="mb-4">
+            <Typography variant="h5" sx={{ mb: 2 }}>
               Skills
             </Typography>
-            <Box className="flex flex-wrap gap-2 mb-6">
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 3 }}>
               {user.skills.map((skill, index) => (
                 <Paper
                   key={index}
                   elevation={1}
-                  className="px-3 py-1 bg-primary/10"
+                  sx={{ px: 1.5, py: 0.5, bgcolor: 'primary.main', opacity: 0.1 }}
                 >
                   <Typography variant="body2">{skill}</Typography>
                 </Paper>
@@ -79,12 +78,12 @@ export default function ProfilePage() {
             </Box>
           </Paper>
 
-          <Paper elevation={3} className="p-6">
-            <Typography variant="h5" className="mb-4">
+          <Paper elevation={3} sx={{ p: 3 }}>
+            <Typography variant="h5" sx={{ mb: 2 }}>
               Experience
             </Typography>
             {user.experience.map((exp, index) => (
-              <Box key={index} className="mb-4">
+              <Box key={index} sx={{ mb: 2 }}>
                 <Typography variant="h6">{exp.title}</Typography>
                 <Typography variant="subtitle1" color="text.secondary">
                   {exp.company}
@@ -95,8 +94,8 @@ export default function ProfilePage() {
               </Box>
             ))}
           </Paper>
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
     </Container>
   );
 } 
