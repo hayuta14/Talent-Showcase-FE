@@ -15,8 +15,13 @@ export interface PostResponseDTO {
   description?: string | null;
   /** @nullable */
   videoUrl?: string | null;
+  /** @nullable */
+  userImageUrl?: string | null;
+  /** @nullable */
+  username?: string | null;
   isPublic?: boolean;
   uploadedAt?: string;
   likeCount?: number;
   commentCount?: number;
+  likedByCurrentUser?: boolean;
 }

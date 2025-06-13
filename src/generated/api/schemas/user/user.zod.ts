@@ -34,18 +34,22 @@ export const getApiV1UserGetProfileResponse = zod.object({
  * @summary Create or update user profile
  */
 export const patchApiV1UserCreateProfileBody = zod.object({
+  "username": zod.string().min(1),
   "bio": zod.string().min(1),
   "skill": zod.string().min(1),
-  "imageUrl": zod.string().min(1)
+  "imageUrl": zod.string().min(1),
+  "contactInfo": zod.string().min(1)
 })
 
 export const patchApiV1UserCreateProfileResponse = zod.object({
   "success": zod.boolean().optional(),
   "message": zod.string().nullish(),
   "data": zod.object({
+  "username": zod.string().min(1),
   "bio": zod.string().min(1),
   "skill": zod.string().min(1),
-  "imageUrl": zod.string().min(1)
+  "imageUrl": zod.string().min(1),
+  "contactInfo": zod.string().min(1)
 }).optional(),
   "Code": zod.number().optional(),
   "errors": zod.array(zod.string()).nullish(),

@@ -8,9 +8,13 @@
 
 export interface UserProfileDTO {
   /** @minLength 1 */
+  username: string;
+  /** @minLength 1 */
   bio: string;
   /** @minLength 1 */
   skill: string;
   /** @minLength 1 */
   imageUrl: string;
+  /** @minLength 1 */
+  contactInfo: string;
 }

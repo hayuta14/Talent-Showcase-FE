@@ -9,7 +9,10 @@
 export interface CommentResponseDTO {
   id?: number;
   postId?: number;
-  userId?: number;
+  /** @nullable */
+  username?: string | null;
+  /** @nullable */
+  userImageUrl?: string | null;
   /** @nullable */
   content?: string | null;
   createdAt?: string;

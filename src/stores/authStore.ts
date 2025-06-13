@@ -4,12 +4,14 @@ import { getAuth } from '@/generated/api/endpoints/auth/auth';
 import { persist } from 'zustand/middleware';
 
 interface JwtPayload {
-  sub: string;
+  nameid: string;
+  email: string;
+  unique_name: string;
+  role: string;
   exp: number;
   iat: number;
-  role: number;
-  id: string;
-  email: string;
+  nbf?: number;
+  userImageUrl?: string;
 }
 
 export interface AuthState {
@@ -91,8 +93,8 @@ export const useAuthStore = create<AuthState>()(
         if (roleId.length == 0) return true;
         const { user } = get();
         if (!user || !user.role) return false;
-        if (user.role == 1) return true;
-        return roleId.includes(user.role);
+        if (Number(user.role) == 1) return true;
+        return roleId.includes(Number(user.role));
       },
       getTokens: () => get(),
     }),
