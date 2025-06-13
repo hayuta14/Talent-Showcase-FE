@@ -26,10 +26,13 @@ export const postApiV1PostResponse = zod.object({
   "categoryId": zod.number().nullish(),
   "description": zod.string().nullish(),
   "videoUrl": zod.string().nullish(),
+  "userImageUrl": zod.string().nullish(),
+  "username": zod.string().nullish(),
   "isPublic": zod.boolean().optional(),
   "uploadedAt": zod.string().datetime({}).optional(),
   "likeCount": zod.number().optional(),
-  "commentCount": zod.number().optional()
+  "commentCount": zod.number().optional(),
+  "likedByCurrentUser": zod.boolean().optional()
 }).optional(),
   "Code": zod.number().optional(),
   "errors": zod.array(zod.string()).nullish(),
@@ -67,10 +70,13 @@ export const getApiV1PostIdResponse = zod.object({
   "categoryId": zod.number().nullish(),
   "description": zod.string().nullish(),
   "videoUrl": zod.string().nullish(),
+  "userImageUrl": zod.string().nullish(),
+  "username": zod.string().nullish(),
   "isPublic": zod.boolean().optional(),
   "uploadedAt": zod.string().datetime({}).optional(),
   "likeCount": zod.number().optional(),
-  "commentCount": zod.number().optional()
+  "commentCount": zod.number().optional(),
+  "likedByCurrentUser": zod.boolean().optional()
 }).optional(),
   "Code": zod.number().optional(),
   "errors": zod.array(zod.string()).nullish(),
@@ -98,10 +104,13 @@ export const patchApiV1PostIdResponse = zod.object({
   "categoryId": zod.number().nullish(),
   "description": zod.string().nullish(),
   "videoUrl": zod.string().nullish(),
+  "userImageUrl": zod.string().nullish(),
+  "username": zod.string().nullish(),
   "isPublic": zod.boolean().optional(),
   "uploadedAt": zod.string().datetime({}).optional(),
   "likeCount": zod.number().optional(),
-  "commentCount": zod.number().optional()
+  "commentCount": zod.number().optional(),
+  "likedByCurrentUser": zod.boolean().optional()
 }).optional(),
   "Code": zod.number().optional(),
   "errors": zod.array(zod.string()).nullish(),
@@ -148,7 +157,8 @@ export const postApiV1PostCommentResponse = zod.object({
   "data": zod.object({
   "id": zod.number().optional(),
   "postId": zod.number().optional(),
-  "userId": zod.number().optional(),
+  "username": zod.string().nullish(),
+  "userImageUrl": zod.string().nullish(),
   "content": zod.string().nullish(),
   "createdAt": zod.string().datetime({}).optional()
 }).optional(),
@@ -172,7 +182,8 @@ export const patchApiV1PostCommentCommentIdResponse = zod.object({
   "data": zod.object({
   "id": zod.number().optional(),
   "postId": zod.number().optional(),
-  "userId": zod.number().optional(),
+  "username": zod.string().nullish(),
+  "userImageUrl": zod.string().nullish(),
   "content": zod.string().nullish(),
   "createdAt": zod.string().datetime({}).optional()
 }).optional(),

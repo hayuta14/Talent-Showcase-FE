@@ -4,8 +4,6 @@ import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import ProfileCard from './components/ProfileCard';
-import SidebarMenu from './components/SidebarMenu';
-import Stories from './components/Stories';
 import ShareBox from './components/ShareBox';
 import FeedProvider from './components/Feed';
 import WhoToFollow from './components/WhoToFollow';
@@ -17,7 +15,6 @@ export default function Home() {
 
   return (
     <Container maxWidth="xl" className="py-8">
-      <SidebarMenu />
       <Grid container spacing={4} columns={12}>
         {/* Left Sidebar */}
         <Grid size={{ xs: 12, md: 3 }}>
@@ -27,7 +24,6 @@ export default function Home() {
         </Grid>
         {/* Main Content */}
         <Grid size={{ xs: 12, md: 6 }}>
-          <Stories />
           <FeedProvider>
             <ShareBox />
           </FeedProvider>

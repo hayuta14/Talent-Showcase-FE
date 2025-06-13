@@ -5,6 +5,7 @@ import { Container, Box, Typography, TextField, Button, Paper, Tab, Tabs } from 
 import { getAuth } from '@/generated/api/endpoints/auth/auth';
 import { useAuthStore } from '@/stores/authStore';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function AuthPage() {
   const [tab, setTab] = useState(0);
@@ -139,6 +140,14 @@ export default function AuthPage() {
               >
                 {loading ? 'Logging in...' : 'Login'}
               </Button>
+              <Box textAlign="center" mt={2}>
+                <Typography variant="body2">
+                  Don&apos;t have an account?{' '}
+                  <Link href="/auth/register" style={{ color: '#1976d2', textDecoration: 'underline' }}>
+                    Register
+                  </Link>
+                </Typography>
+              </Box>
             </Box>
           ) : (
             <Box component="form" className="space-y-4" onSubmit={handleRegister}>
