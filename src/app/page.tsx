@@ -1,8 +1,13 @@
 'use client';
 
 import { Button, Container, Typography, Box } from '@mui/material';
+import { useRouter } from 'next/navigation';
+
 
 export default function Home() {
+  const router = useRouter();
+  
+
   return (
     <Container maxWidth="lg">
       <Box className="min-h-screen flex flex-col items-center justify-center">
@@ -13,12 +18,44 @@ export default function Home() {
           A platform to showcase your talents
         </Typography>
         <Box className="flex gap-4">
-          <Button variant="contained" color="primary" size="large">
-            Get Started
-          </Button>
-          <Button variant="outlined" color="secondary" size="large">
-            Learn More
-          </Button>
+          {true ? (
+            <>
+              <Button 
+                variant="contained" 
+                color="primary" 
+                size="large"
+                onClick={() => router.push('/profile')}
+              >
+                View Profile
+              </Button>
+              <Button 
+                variant="outlined" 
+                color="secondary" 
+                size="large"
+                onClick={() => router.push('/talents')}
+              >
+                Browse Talents
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button 
+                variant="contained" 
+                color="primary" 
+                size="large"
+                onClick={() => router.push('/auth')}
+              >
+                Get Started
+              </Button>
+              <Button 
+                variant="outlined" 
+                color="secondary" 
+                size="large"
+              >
+                Learn More
+              </Button>
+            </>
+          )}
         </Box>
       </Box>
     </Container>

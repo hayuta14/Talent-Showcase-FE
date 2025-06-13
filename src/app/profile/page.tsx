@@ -3,26 +3,7 @@
 import { Container, Box, Paper, Typography, Button, Avatar } from '@mui/material';
 
 export default function ProfilePage() {
-  // Mock user data
-  const user = {
-    name: 'John Doe',
-    email: 'john@example.com',
-    avatar: 'https://source.unsplash.com/random/200x200?portrait',
-    bio: 'Professional dancer with a passion for contemporary art.',
-    skills: ['Dancing', 'Choreography', 'Teaching'],
-    experience: [
-      {
-        title: 'Lead Dancer',
-        company: 'Modern Dance Company',
-        period: '2020 - Present'
-      },
-      {
-        title: 'Dance Instructor',
-        company: 'Arts Academy',
-        period: '2018 - 2020'
-      }
-    ]
-  };
+  const { user } = useAuth();
 
   return (
     <Container maxWidth="lg" sx={{ py: 6 }}>
@@ -98,4 +79,4 @@ export default function ProfilePage() {
       </Box>
     </Container>
   );
-} 
+}
