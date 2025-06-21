@@ -12,7 +12,7 @@ import WhoToFollow from './components/WhoToFollow';
 import News from './components/News';
 
 export default function Home() {
-  const router = useRouter();
+
   
 
   return (

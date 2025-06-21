@@ -78,7 +78,7 @@ export default function AuthPage() {
     <Box
       sx={{
         minHeight: '100vh',
-        background: `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.secondary.main} 90%)`,
+        background: 'linear-gradient(45deg, #1976d2 30%, #9c27b0 90%)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -86,29 +86,28 @@ export default function AuthPage() {
       }}
     >
       <Container maxWidth="sm">
-        <Fade in timeout={1000}>
-          <Paper
-            elevation={6}
+        <Paper
+          elevation={6}
+          sx={{
+            p: 4,
+            borderRadius: 2,
+            background: 'rgba(255,255,255,0.9)',
+            backdropFilter: 'blur(10px)',
+          }}
+        >
+          <Typography
+            variant="h4"
+            component="h1"
+            align="center"
+            gutterBottom
             sx={{
-              p: 4,
-              borderRadius: 2,
-              background: alpha(theme.palette.background.paper, 0.9),
-              backdropFilter: 'blur(10px)',
+              fontWeight: 'bold',
+              color: '#1976d2',
+              mb: 4,
             }}
           >
-            <Typography
-              variant="h4"
-              component="h1"
-              align="center"
-              gutterBottom
-              sx={{
-                fontWeight: 'bold',
-                color: theme.palette.primary.main,
-                mb: 4,
-              }}
-            >
-              Welcome to Talent Showcase
-            </Typography>
+            Welcome to Talent Showcase
+          </Typography>
 
           {tab === 0 ? (
             <Box component="form" className="space-y-4" onSubmit={handleLogin}>
@@ -197,7 +196,7 @@ export default function AuthPage() {
             </Box>
           )}
         </Paper>
-      </Box>
-    </Container>
+      </Container>
+    </Box>
   );
 }
