@@ -1,71 +1,76 @@
 'use client';
 
 import { useState } from 'react';
+import { Container, Box, Typography, TextField, Button, Paper, Tab, Tabs } from '@mui/material';
+import { getAuth } from '@/generated/api/endpoints/auth/auth';
+import { useAuthStore } from '@/stores/authStore';
 import { useRouter } from 'next/navigation';
-import {
-  Container,
-  Box,
-  Typography,
-  TextField,
-  Button,
-  Paper,
-  Tab,
-  Tabs,
-  InputAdornment,
-  IconButton,
-  useTheme,
-  alpha,
-  Fade,
-  Alert,
-} from '@mui/material';
-import {
-  Email as EmailIcon,
-  Lock as LockIcon,
-  Person as PersonIcon,
-  Visibility,
-  VisibilityOff,
-} from '@mui/icons-material';
-import { useAuth } from '../context/AuthContext';
 
 export default function AuthPage() {
   const [tab, setTab] = useState(0);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [fullName, setFullName] = useState('');
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const theme = useTheme();
-  const { login } = useAuth();
+  const setTokens = useAuthStore((s) => s.setTokens);
   const router = useRouter();
 
-  const handleTogglePassword = () => setShowPassword(!showPassword);
-  const handleToggleConfirmPassword = () => setShowConfirmPassword(!showConfirmPassword);
+  const [registerData, setRegisterData] = useState({
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    phoneNumber: '',
+  });
+  const [registerLoading, setRegisterLoading] = useState(false);
+  const [registerError, setRegisterError] = useState('');
+  const [registerSuccess, setRegisterSuccess] = useState('');
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     setError('');
     try {
-      await login(email, password);
-      router.push('/');
-    } catch (err) {
-      setError('Invalid email or password');
+      const auth = getAuth();
+      const res = await auth.postApiV1AuthLogin({ email, password });
+      const accessToken = res.data?.accessToken;
+      if (accessToken) {
+        setTokens(accessToken);
+        router.push('/');
+      } else {
+        setError('Login failed: No access token returned');
+      }
+    } catch (err: any) {
+      setError(err?.response?.data?.message || 'Login failed');
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
+    setRegisterLoading(true);
+    setRegisterError('');
+    setRegisterSuccess('');
+    if (registerData.password !== registerData.confirmPassword) {
+      setRegisterError('Passwords do not match');
+      setRegisterLoading(false);
       return;
     }
     try {
-      await login(email, password);
-      router.push('/');
-    } catch (err) {
-      setError('Registration failed');
+      const auth = getAuth();
+      await auth.postApiV1AuthRegister({
+        username: registerData.username,
+        email: registerData.email,
+        password: registerData.password,
+        phoneNumber: registerData.phoneNumber,
+      });
+      setRegisterSuccess('Register successful! Please login.');
+      setTab(0);
+    } catch (err: any) {
+      setRegisterError(err?.response?.data?.message || 'Register failed');
+    } finally {
+      setRegisterLoading(false);
     }
   };
 
@@ -105,224 +110,94 @@ export default function AuthPage() {
               Welcome to Talent Showcase
             </Typography>
 
-            <Tabs
-              value={tab}
-              onChange={(_, newValue) => setTab(newValue)}
-              centered
-              sx={{
-                mb: 4,
-                '& .MuiTabs-indicator': {
-                  height: 3,
-                  borderRadius: 3,
-                },
-              }}
-            >
-              <Tab
-                label="Login"
-                sx={{
-                  fontSize: '1.1rem',
-                  fontWeight: 'medium',
-                }}
+          {tab === 0 ? (
+            <Box component="form" className="space-y-4" onSubmit={handleLogin}>
+              <TextField
+                fullWidth
+                label="Email"
+                type="email"
+                variant="outlined"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
               />
-              <Tab
-                label="Register"
-                sx={{
-                  fontSize: '1.1rem',
-                  fontWeight: 'medium',
-                }}
+              <TextField
+                fullWidth
+                label="Password"
+                type="password"
+                variant="outlined"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
               />
-            </Tabs>
-
-            {error && (
-              <Alert severity="error" sx={{ mb: 3 }}>
-                {error}
-              </Alert>
-            )}
-
-            {tab === 0 ? (
-              <Box component="form" onSubmit={handleLogin} sx={{ '& > :not(style)': { mb: 2 } }}>
-                <TextField
-                  fullWidth
-                  label="Email"
-                  type="email"
-                  variant="outlined"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <EmailIcon color="primary" />
-                      </InputAdornment>
-                    ),
-                  }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
-                    },
-                  }}
-                />
-                <TextField
-                  fullWidth
-                  label="Password"
-                  type={showPassword ? 'text' : 'password'}
-                  variant="outlined"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <LockIcon color="primary" />
-                      </InputAdornment>
-                    ),
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton onClick={handleTogglePassword} edge="end">
-                          {showPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
-                    },
-                  }}
-                />
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  size="large"
-                  sx={{
-                    mt: 3,
-                    py: 1.5,
-                    borderRadius: 2,
-                    textTransform: 'none',
-                    fontSize: '1.1rem',
-                    fontWeight: 'bold',
-                    boxShadow: 3,
-                  }}
-                >
-                  Login
-                </Button>
-              </Box>
-            ) : (
-              <Box component="form" onSubmit={handleRegister} sx={{ '& > :not(style)': { mb: 2 } }}>
-                <TextField
-                  fullWidth
-                  label="Full Name"
-                  variant="outlined"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <PersonIcon color="primary" />
-                      </InputAdornment>
-                    ),
-                  }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
-                    },
-                  }}
-                />
-                <TextField
-                  fullWidth
-                  label="Email"
-                  type="email"
-                  variant="outlined"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <EmailIcon color="primary" />
-                      </InputAdornment>
-                    ),
-                  }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
-                    },
-                  }}
-                />
-                <TextField
-                  fullWidth
-                  label="Password"
-                  type={showPassword ? 'text' : 'password'}
-                  variant="outlined"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <LockIcon color="primary" />
-                      </InputAdornment>
-                    ),
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton onClick={handleTogglePassword} edge="end">
-                          {showPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
-                    },
-                  }}
-                />
-                <TextField
-                  fullWidth
-                  label="Confirm Password"
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  variant="outlined"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <LockIcon color="primary" />
-                      </InputAdornment>
-                    ),
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton onClick={handleToggleConfirmPassword} edge="end">
-                          {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
-                    },
-                  }}
-                />
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  size="large"
-                  sx={{
-                    mt: 3,
-                    py: 1.5,
-                    borderRadius: 2,
-                    textTransform: 'none',
-                    fontSize: '1.1rem',
-                    fontWeight: 'bold',
-                    boxShadow: 3,
-                  }}
-                >
-                  Register
-                </Button>
-              </Box>
-            )}
-          </Paper>
-        </Fade>
-      </Container>
-    </Box>
+              {error && <Typography color="error">{error}</Typography>}
+              <Button
+                fullWidth
+                variant="contained"
+                color="primary"
+                size="large"
+                className="mt-4"
+                type="submit"
+                disabled={loading}
+              >
+                {loading ? 'Logging in...' : 'Login'}
+              </Button>
+            </Box>
+          ) : (
+            <Box component="form" className="space-y-4" onSubmit={handleRegister}>
+              <TextField
+                fullWidth
+                label="Full Name"
+                variant="outlined"
+                value={registerData.username}
+                onChange={e => setRegisterData(d => ({ ...d, username: e.target.value }))}
+              />
+              <TextField
+                fullWidth
+                label="Email"
+                type="email"
+                variant="outlined"
+                value={registerData.email}
+                onChange={e => setRegisterData(d => ({ ...d, email: e.target.value }))}
+              />
+              <TextField
+                fullWidth
+                label="Password"
+                type="password"
+                variant="outlined"
+                value={registerData.password}
+                onChange={e => setRegisterData(d => ({ ...d, password: e.target.value }))}
+              />
+              <TextField
+                fullWidth
+                label="Confirm Password"
+                type="password"
+                variant="outlined"
+                value={registerData.confirmPassword}
+                onChange={e => setRegisterData(d => ({ ...d, confirmPassword: e.target.value }))}
+              />
+              <TextField
+                fullWidth
+                label="Phone Number"
+                variant="outlined"
+                value={registerData.phoneNumber}
+                onChange={e => setRegisterData(d => ({ ...d, phoneNumber: e.target.value }))}
+              />
+              {registerError && <Typography color="error">{registerError}</Typography>}
+              {registerSuccess && <Typography color="primary">{registerSuccess}</Typography>}
+              <Button
+                fullWidth
+                variant="contained"
+                color="primary"
+                size="large"
+                className="mt-4"
+                type="submit"
+                disabled={registerLoading}
+              >
+                {registerLoading ? 'Registering...' : 'Register'}
+              </Button>
+            </Box>
+          )}
+        </Paper>
+      </Box>
+    </Container>
   );
 }
