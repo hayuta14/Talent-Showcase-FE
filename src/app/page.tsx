@@ -1,26 +1,41 @@
 'use client';
 
-import { Button, Container, Typography, Box } from '@mui/material';
+import Grid from '@mui/material/Grid';
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
+import ProfileCard from './components/ProfileCard';
+import ShareBox from './components/ShareBox';
+import FeedProvider from './components/Feed';
+import WhoToFollow from './components/WhoToFollow';
+import News from './components/News';
 
 export default function Home() {
+
+  
+
   return (
-    <Container maxWidth="lg">
-      <Box className="min-h-screen flex flex-col items-center justify-center">
-        <Typography variant="h2" component="h1" className="mb-8 text-center">
-          Welcome to Talent Showcase
-        </Typography>
-        <Typography variant="h5" component="h2" className="mb-8 text-center text-gray-600">
-          A platform to showcase your talents
-        </Typography>
-        <Box className="flex gap-4">
-          <Button variant="contained" color="primary" size="large">
-            Get Started
-          </Button>
-          <Button variant="outlined" color="secondary" size="large">
-            Learn More
-          </Button>
-        </Box>
-      </Box>
+    <Container maxWidth="xl" className="py-8">
+      <Grid container spacing={4} columns={12}>
+        {/* Left Sidebar */}
+        <Grid size={{ xs: 12, md: 3 }}>
+          <div className="sticky top-4">
+            <ProfileCard />
+          </div>
+        </Grid>
+        {/* Main Content */}
+        <Grid size={{ xs: 12, md: 6 }}>
+          <FeedProvider>
+            <ShareBox />
+          </FeedProvider>
+        </Grid>
+        {/* Right Sidebar */}
+        <Grid size={{ xs: 12, md: 3 }}>
+          <div className="sticky top-4">
+            <WhoToFollow />
+            <News />
+          </div>
+        </Grid>
+      </Grid>
     </Container>
   );
 }
