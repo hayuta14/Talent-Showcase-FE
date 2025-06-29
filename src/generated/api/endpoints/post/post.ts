@@ -10,6 +10,7 @@ import type {
   CommentDTO,
   CommentResponseDTOApiResponse,
   CommentUpdateDTO,
+  GetApiV1PostCommunityCommunityIdParams,
   GetApiV1PostParams,
   GetApiV1PostPostIdCommentsParams,
   Int32ApiResponse,
@@ -17,6 +18,7 @@ import type {
   PostDTO,
   PostLikeDTO,
   PostResponseDTOApiResponse,
+  PostResponseDTOListApiResponse,
   StringApiResponse
 } from '../../models';
 
@@ -114,7 +116,7 @@ const postApiV1Post = (
     postId: number,
     params?: GetApiV1PostPostIdCommentsParams,
  ) => {
-      return api<ObjectApiResponse>(
+      return api<CommentResponseDTOApiResponse>(
       {url: `/api/v1/Post/${postId}/comments`, method: 'GET',
         params
     },
@@ -131,12 +133,104 @@ const postApiV1Post = (
   const getApiV1PostPostIdCommentCount = (
     postId: number,
  ) => {
-      return api<Int32ApiResponse>(
+      return api<ObjectApiResponse>(
       {url: `/api/v1/Post/${postId}/comment-count`, method: 'GET'
     },
       );
     }
-  return {postApiV1Post,getApiV1Post,getApiV1PostId,patchApiV1PostId,deleteApiV1PostId,postApiV1PostLike,postApiV1PostComment,patchApiV1PostCommentCommentId,deleteApiV1PostCommentCommentId,getApiV1PostPostIdComments,getApiV1PostPostIdLikeCount,getApiV1PostPostIdCommentCount}};
+  const postApiV1PostCommentCommentIdSubComment = (
+    commentId: number,
+    postApiV1PostCommentCommentIdSubCommentBody: string,
+ ) => {
+      return api<CommentResponseDTOApiResponse>(
+      {url: `/api/v1/Post/comment/${commentId}/sub-comment`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: postApiV1PostCommentCommentIdSubCommentBody
+    },
+      );
+    }
+  const patchApiV1PostCommentCommentIdSubCommentSubCommentIndex = (
+    commentId: number,
+    subCommentIndex: number,
+    patchApiV1PostCommentCommentIdSubCommentSubCommentIndexBody: string,
+ ) => {
+      return api<CommentResponseDTOApiResponse>(
+      {url: `/api/v1/Post/comment/${commentId}/sub-comment/${subCommentIndex}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: patchApiV1PostCommentCommentIdSubCommentSubCommentIndexBody
+    },
+      );
+    }
+  const deleteApiV1PostCommentCommentIdSubCommentSubCommentIndex = (
+    commentId: number,
+    subCommentIndex: number,
+ ) => {
+      return api<CommentResponseDTOApiResponse>(
+      {url: `/api/v1/Post/comment/${commentId}/sub-comment/${subCommentIndex}`, method: 'DELETE'
+    },
+      );
+    }
+  const postApiV1PostCommunityCommunityId = (
+    communityId: number,
+    postDTO: PostDTO,
+ ) => {
+      return api<PostResponseDTOApiResponse>(
+      {url: `/api/v1/Post/community/${communityId}`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: postDTO
+    },
+      );
+    }
+  const getApiV1PostCommunityCommunityId = (
+    communityId: number,
+    params?: GetApiV1PostCommunityCommunityIdParams,
+ ) => {
+      return api<PostResponseDTOListApiResponse>(
+      {url: `/api/v1/Post/community/${communityId}`, method: 'GET',
+        params
+    },
+      );
+    }
+  const getApiV1PostCommunityCommunityIdPostId = (
+    communityId: number,
+    postId: number,
+ ) => {
+      return api<PostResponseDTOApiResponse>(
+      {url: `/api/v1/Post/community/${communityId}/${postId}`, method: 'GET'
+    },
+      );
+    }
+  const patchApiV1PostCommunityCommunityIdPostId = (
+    communityId: number,
+    postId: number,
+    postDTO: PostDTO,
+ ) => {
+      return api<PostResponseDTOApiResponse>(
+      {url: `/api/v1/Post/community/${communityId}/${postId}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: postDTO
+    },
+      );
+    }
+  const deleteApiV1PostCommunityCommunityIdPostId = (
+    communityId: number,
+    postId: number,
+ ) => {
+      return api<BooleanApiResponse>(
+      {url: `/api/v1/Post/community/${communityId}/${postId}`, method: 'DELETE'
+    },
+      );
+    }
+  const getApiV1PostCommunityCommunityIdUserTargetUserId = (
+    communityId: number,
+    targetUserId: number,
+ ) => {
+      return api<PostResponseDTOListApiResponse>(
+      {url: `/api/v1/Post/community/${communityId}/user/${targetUserId}`, method: 'GET'
+    },
+      );
+    }
+  return {postApiV1Post,getApiV1Post,getApiV1PostId,patchApiV1PostId,deleteApiV1PostId,postApiV1PostLike,postApiV1PostComment,patchApiV1PostCommentCommentId,deleteApiV1PostCommentCommentId,getApiV1PostPostIdComments,getApiV1PostPostIdLikeCount,getApiV1PostPostIdCommentCount,postApiV1PostCommentCommentIdSubComment,patchApiV1PostCommentCommentIdSubCommentSubCommentIndex,deleteApiV1PostCommentCommentIdSubCommentSubCommentIndex,postApiV1PostCommunityCommunityId,getApiV1PostCommunityCommunityId,getApiV1PostCommunityCommunityIdPostId,patchApiV1PostCommunityCommunityIdPostId,deleteApiV1PostCommunityCommunityIdPostId,getApiV1PostCommunityCommunityIdUserTargetUserId}};
 export type PostApiV1PostResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getPost>['postApiV1Post']>>>
 export type GetApiV1PostResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getPost>['getApiV1Post']>>>
 export type GetApiV1PostIdResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getPost>['getApiV1PostId']>>>
@@ -149,3 +243,12 @@ export type DeleteApiV1PostCommentCommentIdResult = NonNullable<Awaited<ReturnTy
 export type GetApiV1PostPostIdCommentsResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getPost>['getApiV1PostPostIdComments']>>>
 export type GetApiV1PostPostIdLikeCountResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getPost>['getApiV1PostPostIdLikeCount']>>>
 export type GetApiV1PostPostIdCommentCountResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getPost>['getApiV1PostPostIdCommentCount']>>>
+export type PostApiV1PostCommentCommentIdSubCommentResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getPost>['postApiV1PostCommentCommentIdSubComment']>>>
+export type PatchApiV1PostCommentCommentIdSubCommentSubCommentIndexResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getPost>['patchApiV1PostCommentCommentIdSubCommentSubCommentIndex']>>>
+export type DeleteApiV1PostCommentCommentIdSubCommentSubCommentIndexResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getPost>['deleteApiV1PostCommentCommentIdSubCommentSubCommentIndex']>>>
+export type PostApiV1PostCommunityCommunityIdResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getPost>['postApiV1PostCommunityCommunityId']>>>
+export type GetApiV1PostCommunityCommunityIdResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getPost>['getApiV1PostCommunityCommunityId']>>>
+export type GetApiV1PostCommunityCommunityIdPostIdResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getPost>['getApiV1PostCommunityCommunityIdPostId']>>>
+export type PatchApiV1PostCommunityCommunityIdPostIdResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getPost>['patchApiV1PostCommunityCommunityIdPostId']>>>
+export type DeleteApiV1PostCommunityCommunityIdPostIdResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getPost>['deleteApiV1PostCommunityCommunityIdPostId']>>>
+export type GetApiV1PostCommunityCommunityIdUserTargetUserIdResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getPost>['getApiV1PostCommunityCommunityIdUserTargetUserId']>>>

@@ -5,14 +5,14 @@
  * API for Talent Show Case application
  * OpenAPI spec version: v1
  */
+import type { TalentCategoryProfileDTO } from './talentCategoryProfileDTO';
 
 export interface UserProfileDTO {
   /** @minLength 1 */
   username: string;
   /** @minLength 1 */
   bio: string;
-  /** @minLength 1 */
-  skill: string;
+  talentCategories: TalentCategoryProfileDTO[];
   /** @minLength 1 */
   imageUrl: string;
   /** @minLength 1 */

@@ -22,9 +22,13 @@ import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { getCategory } from '@/generated/api/endpoints/category/category';
 import type { TalentCategoryProfileDTO } from '@/generated/api/models/talentCategoryProfileDTO';
+import { useParams } from 'next/navigation';
 dayjs.extend(relativeTime);
 
-export default function ProfilePage() {
+export default function ProfileByIdPage() {
+  const params = useParams();
+  const userId = params.id ? parseInt(params.id as string) : null;
+  
   const [profile, setProfile] = useState<UserResponseDTO | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -55,14 +59,20 @@ export default function ProfilePage() {
   const [postEditError, setPostEditError] = useState('');
   const [allCategories, setAllCategories] = useState<{id:number, name:string}[]>([]);
 
-  // Fetch profile
+  // Fetch profile by ID
   useEffect(() => {
+    if (!userId) {
+      setError('Invalid user ID');
+      setLoading(false);
+      return;
+    }
+
     const fetchProfile = async () => {
       setLoading(true);
       setError('');
       try {
         const api = getUser();
-        const res = await api.getApiV1UserGetProfile();
+        const res = await api.getApiV1UserGetProfileUserId(userId);
         setProfile(res.data || null);
       } catch (err: any) {
         setError('Failed to load profile');
@@ -71,7 +81,7 @@ export default function ProfilePage() {
       }
     };
     fetchProfile();
-  }, []);
+  }, [userId]);
 
   // Fetch user's posts after profile is loaded
   useEffect(() => {
@@ -81,7 +91,7 @@ export default function ProfilePage() {
       setPostsError('');
       try {
         const api = getPost();
-        const res = await api.getApiV1Post({ page: 1, pageSize: 100 }); // get all (or first 100)
+        const res = await api.getApiV1Post({ page: 1, pageSize: 100 });
         let allPosts: any[] = [];
         if (Array.isArray(res.data)) allPosts = res.data;
         else if (res.data && typeof res.data === 'object' && Array.isArray((res.data as any).items)) allPosts = (res.data as any).items;
@@ -121,9 +131,11 @@ export default function ProfilePage() {
     });
     setProfileEditOpen(true);
   };
+  
   const handleProfileEditClose = () => {
     setProfileEditOpen(false);
   };
+  
   // Handle profile edit form submit
   const handleProfileEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -135,8 +147,10 @@ export default function ProfilePage() {
       await api.patchApiV1UserCreateProfile(profileEditData);
       setProfileEditSuccess('Profile updated!');
       // Reload profile
-      const res = await api.getApiV1UserGetProfile();
-      setProfile(res.data || null);
+      if (userId) {
+        const res = await api.getApiV1UserGetProfileUserId(userId);
+        setProfile(res.data || null);
+      }
       setProfileEditOpen(false);
     } catch (err: any) {
       setProfileEditError('Failed to update profile');
@@ -144,6 +158,7 @@ export default function ProfilePage() {
       setProfileEditLoading(false);
     }
   };
+
   // Handle profile image upload
   const handleProfileImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -170,10 +185,12 @@ export default function ProfilePage() {
     setAnchorEl(event.currentTarget);
     setMenuPostId(postId);
   };
+  
   const handleMenuClose = () => {
     setAnchorEl(null);
     setMenuPostId(null);
   };
+  
   const handleDelete = async () => {
     if (!menuPostId) return;
     setDeleting(true);
@@ -188,10 +205,11 @@ export default function ProfilePage() {
       setDeleting(false);
     }
   };
+  
   const handleLike = async (postId: number, liked: boolean) => {
     try {
       const api = getPost();
-      await api.postApiV1PostLike({ postId }); // Toggle like/unlike
+      await api.postApiV1PostLike({ postId });
       setPosts(prev =>
         prev.map(p =>
           p.id === postId
@@ -225,11 +243,13 @@ export default function ProfilePage() {
       setCommentLoading(false);
     }
   };
+  
   const handleCloseComments = () => {
     setCommentOpen(false);
     setComments([]);
     setCommentPostId(null);
   };
+  
   const handleSendComment = async () => {
     if (!commentInput.trim() || !commentPostId) return;
     setSending(true);
@@ -254,6 +274,7 @@ export default function ProfilePage() {
       setSending(false);
     }
   };
+  
   // Edit post handlers
   const handleEdit = () => {
     const post = posts.find(p => p.id === menuPostId);
@@ -261,6 +282,7 @@ export default function ProfilePage() {
     setPostEditOpen(true);
     handleMenuClose();
   };
+  
   const handlePostVideoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -287,7 +309,6 @@ export default function ProfilePage() {
     <Container maxWidth="lg" className="py-0 px-0">
       {/* Cover section */}
       <Box className="relative w-full h-56 md:h-72 bg-gradient-to-r from-blue-400 to-purple-500">
-        {/* Cover image placeholder, can replace with real image */}
         {/* Avatar overlay */}
         <Box className="absolute left-1/2 -bottom-16 md:-bottom-20 transform -translate-x-1/2 md:translate-x-0 md:left-16 z-10">
           <Avatar
@@ -300,6 +321,7 @@ export default function ProfilePage() {
           </Avatar>
         </Box>
       </Box>
+      
       {/* Info + Edit + Tabs */}
       <Box className="flex flex-col md:flex-row md:items-end md:justify-between px-4 md:px-16 mt-20 md:mt-8">
         <Box className="flex flex-col md:flex-row md:items-end gap-4 md:gap-8">
@@ -309,14 +331,19 @@ export default function ProfilePage() {
             <Typography variant="body2" className="text-gray-600 mb-2">{profile.bio}</Typography>
           </Box>
         </Box>
-        <Button variant="contained" color="primary" onClick={handleProfileEditOpen} className="mt-4 md:mt-0 w-full md:w-auto">Chỉnh sửa trang cá nhân</Button>
+        {/* Only show edit button if this is the current user's profile */}
+        {profile.username === currentUsername && (
+          <Button variant="contained" color="primary" onClick={handleProfileEditOpen} className="mt-4 md:mt-0 w-full md:w-auto">Chỉnh sửa trang cá nhân</Button>
+        )}
       </Box>
+      
       {/* Tabs */}
       <Box className="mt-6 md:mt-8 px-4 md:px-16 border-b border-gray-200">
         <Tabs value={tab} onChange={(_, v) => setTab(v)}>
           <Tab label="Bài viết" />
         </Tabs>
       </Box>
+      
       {/* Main content: 2 columns on desktop, 1 column on mobile */}
       <Box className="flex flex-col md:flex-row gap-8 px-4 md:px-16 mt-8">
         {/* Left: Info */}
@@ -339,6 +366,7 @@ export default function ProfilePage() {
             </Stack>
           </Paper>
         </Box>
+        
         {/* Right: Posts */}
         <Box className="md:w-2/3 w-full">
           {tab === 0 && (
@@ -390,7 +418,7 @@ export default function ProfilePage() {
                         <IconButton size="small">
                           <ShareIcon />
                         </IconButton>
-                        <span>{post.shareCount ?? 0}</span> {/* Placeholder, always 0 */}
+                        <span>{post.shareCount ?? 0}</span>
                       </Box>
                     </Paper>
                   ))}
@@ -405,6 +433,7 @@ export default function ProfilePage() {
           )}
         </Box>
       </Box>
+      
       {/* Profile Edit Dialog */}
       <Dialog open={profileEditOpen} onClose={handleProfileEditClose} maxWidth="sm" fullWidth>
         <DialogTitle>Edit Profile</DialogTitle>
@@ -517,6 +546,7 @@ export default function ProfilePage() {
           </DialogActions>
         </form>
       </Dialog>
+      
       {/* Edit Post Dialog */}
       <Dialog open={postEditOpen} onClose={() => setPostEditOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle>Edit Post</DialogTitle>
@@ -546,7 +576,6 @@ export default function ProfilePage() {
             )}
           </Box>
           {uploadError && <Alert severity="error">{uploadError}</Alert>}
-          {/* Category and Public toggle can be added here if needed */}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setPostEditOpen(false)} color="secondary">Cancel</Button>
@@ -578,6 +607,7 @@ export default function ProfilePage() {
           </Button>
         </DialogActions>
       </Dialog>
+      
       {/* Comment Dialog */}
       <Dialog open={commentOpen} onClose={handleCloseComments} maxWidth="sm" fullWidth disableScrollLock={true}>
         <DialogTitle>Comments</DialogTitle>
@@ -619,4 +649,4 @@ export default function ProfilePage() {
       </Dialog>
     </Container>
   );
-}
+} 
