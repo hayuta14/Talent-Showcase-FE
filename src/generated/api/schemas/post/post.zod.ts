@@ -160,7 +160,14 @@ export const postApiV1PostCommentResponse = zod.object({
   "username": zod.string().nullish(),
   "userImageUrl": zod.string().nullish(),
   "content": zod.string().nullish(),
+  "createdAt": zod.string().datetime({}).optional(),
+  "subComments": zod.array(zod.object({
+  "userId": zod.number().optional(),
+  "username": zod.string().nullish(),
+  "userImageUrl": zod.string().nullish(),
+  "content": zod.string().nullish(),
   "createdAt": zod.string().datetime({}).optional()
+})).nullish()
 }).optional(),
   "Code": zod.number().optional(),
   "errors": zod.array(zod.string()).nullish(),
@@ -185,7 +192,14 @@ export const patchApiV1PostCommentCommentIdResponse = zod.object({
   "username": zod.string().nullish(),
   "userImageUrl": zod.string().nullish(),
   "content": zod.string().nullish(),
+  "createdAt": zod.string().datetime({}).optional(),
+  "subComments": zod.array(zod.object({
+  "userId": zod.number().optional(),
+  "username": zod.string().nullish(),
+  "userImageUrl": zod.string().nullish(),
+  "content": zod.string().nullish(),
   "createdAt": zod.string().datetime({}).optional()
+})).nullish()
 }).optional(),
   "Code": zod.number().optional(),
   "errors": zod.array(zod.string()).nullish(),
@@ -221,7 +235,21 @@ export const getApiV1PostPostIdCommentsQueryParams = zod.object({
 export const getApiV1PostPostIdCommentsResponse = zod.object({
   "success": zod.boolean().optional(),
   "message": zod.string().nullish(),
-  "data": zod.any().nullish(),
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "postId": zod.number().optional(),
+  "username": zod.string().nullish(),
+  "userImageUrl": zod.string().nullish(),
+  "content": zod.string().nullish(),
+  "createdAt": zod.string().datetime({}).optional(),
+  "subComments": zod.array(zod.object({
+  "userId": zod.number().optional(),
+  "username": zod.string().nullish(),
+  "userImageUrl": zod.string().nullish(),
+  "content": zod.string().nullish(),
+  "createdAt": zod.string().datetime({}).optional()
+})).nullish()
+}).optional(),
   "Code": zod.number().optional(),
   "errors": zod.array(zod.string()).nullish(),
   "timestamp": zod.string().datetime({}).optional(),
@@ -249,7 +277,274 @@ export const getApiV1PostPostIdCommentCountParams = zod.object({
 export const getApiV1PostPostIdCommentCountResponse = zod.object({
   "success": zod.boolean().optional(),
   "message": zod.string().nullish(),
-  "data": zod.number().optional(),
+  "data": zod.any().nullish(),
+  "Code": zod.number().optional(),
+  "errors": zod.array(zod.string()).nullish(),
+  "timestamp": zod.string().datetime({}).optional(),
+  "metadata": zod.any().nullish()
+})
+
+export const postApiV1PostCommentCommentIdSubCommentParams = zod.object({
+  "commentId": zod.number()
+})
+
+export const postApiV1PostCommentCommentIdSubCommentBody = zod.string()
+
+export const postApiV1PostCommentCommentIdSubCommentResponse = zod.object({
+  "success": zod.boolean().optional(),
+  "message": zod.string().nullish(),
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "postId": zod.number().optional(),
+  "username": zod.string().nullish(),
+  "userImageUrl": zod.string().nullish(),
+  "content": zod.string().nullish(),
+  "createdAt": zod.string().datetime({}).optional(),
+  "subComments": zod.array(zod.object({
+  "userId": zod.number().optional(),
+  "username": zod.string().nullish(),
+  "userImageUrl": zod.string().nullish(),
+  "content": zod.string().nullish(),
+  "createdAt": zod.string().datetime({}).optional()
+})).nullish()
+}).optional(),
+  "Code": zod.number().optional(),
+  "errors": zod.array(zod.string()).nullish(),
+  "timestamp": zod.string().datetime({}).optional(),
+  "metadata": zod.any().nullish()
+})
+
+export const patchApiV1PostCommentCommentIdSubCommentSubCommentIndexParams = zod.object({
+  "commentId": zod.number(),
+  "subCommentIndex": zod.number()
+})
+
+export const patchApiV1PostCommentCommentIdSubCommentSubCommentIndexBody = zod.string()
+
+export const patchApiV1PostCommentCommentIdSubCommentSubCommentIndexResponse = zod.object({
+  "success": zod.boolean().optional(),
+  "message": zod.string().nullish(),
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "postId": zod.number().optional(),
+  "username": zod.string().nullish(),
+  "userImageUrl": zod.string().nullish(),
+  "content": zod.string().nullish(),
+  "createdAt": zod.string().datetime({}).optional(),
+  "subComments": zod.array(zod.object({
+  "userId": zod.number().optional(),
+  "username": zod.string().nullish(),
+  "userImageUrl": zod.string().nullish(),
+  "content": zod.string().nullish(),
+  "createdAt": zod.string().datetime({}).optional()
+})).nullish()
+}).optional(),
+  "Code": zod.number().optional(),
+  "errors": zod.array(zod.string()).nullish(),
+  "timestamp": zod.string().datetime({}).optional(),
+  "metadata": zod.any().nullish()
+})
+
+export const deleteApiV1PostCommentCommentIdSubCommentSubCommentIndexParams = zod.object({
+  "commentId": zod.number(),
+  "subCommentIndex": zod.number()
+})
+
+export const deleteApiV1PostCommentCommentIdSubCommentSubCommentIndexResponse = zod.object({
+  "success": zod.boolean().optional(),
+  "message": zod.string().nullish(),
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "postId": zod.number().optional(),
+  "username": zod.string().nullish(),
+  "userImageUrl": zod.string().nullish(),
+  "content": zod.string().nullish(),
+  "createdAt": zod.string().datetime({}).optional(),
+  "subComments": zod.array(zod.object({
+  "userId": zod.number().optional(),
+  "username": zod.string().nullish(),
+  "userImageUrl": zod.string().nullish(),
+  "content": zod.string().nullish(),
+  "createdAt": zod.string().datetime({}).optional()
+})).nullish()
+}).optional(),
+  "Code": zod.number().optional(),
+  "errors": zod.array(zod.string()).nullish(),
+  "timestamp": zod.string().datetime({}).optional(),
+  "metadata": zod.any().nullish()
+})
+
+export const postApiV1PostCommunityCommunityIdParams = zod.object({
+  "communityId": zod.number()
+})
+
+export const postApiV1PostCommunityCommunityIdBody = zod.object({
+  "categoryId": zod.number(),
+  "description": zod.string().min(1),
+  "videoUrl": zod.string().nullish(),
+  "isPublic": zod.boolean()
+})
+
+export const postApiV1PostCommunityCommunityIdResponse = zod.object({
+  "success": zod.boolean().optional(),
+  "message": zod.string().nullish(),
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "userId": zod.number().optional(),
+  "categoryId": zod.number().nullish(),
+  "description": zod.string().nullish(),
+  "videoUrl": zod.string().nullish(),
+  "userImageUrl": zod.string().nullish(),
+  "username": zod.string().nullish(),
+  "isPublic": zod.boolean().optional(),
+  "uploadedAt": zod.string().datetime({}).optional(),
+  "likeCount": zod.number().optional(),
+  "commentCount": zod.number().optional(),
+  "likedByCurrentUser": zod.boolean().optional()
+}).optional(),
+  "Code": zod.number().optional(),
+  "errors": zod.array(zod.string()).nullish(),
+  "timestamp": zod.string().datetime({}).optional(),
+  "metadata": zod.any().nullish()
+})
+
+export const getApiV1PostCommunityCommunityIdParams = zod.object({
+  "communityId": zod.number()
+})
+
+export const getApiV1PostCommunityCommunityIdQueryPageDefault = 1;export const getApiV1PostCommunityCommunityIdQueryPageSizeDefault = 10;export const getApiV1PostCommunityCommunityIdQuerySortByDefault = "newest";
+
+export const getApiV1PostCommunityCommunityIdQueryParams = zod.object({
+  "page": zod.number().default(getApiV1PostCommunityCommunityIdQueryPageDefault),
+  "pageSize": zod.number().default(getApiV1PostCommunityCommunityIdQueryPageSizeDefault),
+  "searchTerm": zod.string().optional(),
+  "categoryId": zod.number().optional(),
+  "sortBy": zod.string().default(getApiV1PostCommunityCommunityIdQuerySortByDefault)
+})
+
+export const getApiV1PostCommunityCommunityIdResponse = zod.object({
+  "success": zod.boolean().optional(),
+  "message": zod.string().nullish(),
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "userId": zod.number().optional(),
+  "categoryId": zod.number().nullish(),
+  "description": zod.string().nullish(),
+  "videoUrl": zod.string().nullish(),
+  "userImageUrl": zod.string().nullish(),
+  "username": zod.string().nullish(),
+  "isPublic": zod.boolean().optional(),
+  "uploadedAt": zod.string().datetime({}).optional(),
+  "likeCount": zod.number().optional(),
+  "commentCount": zod.number().optional(),
+  "likedByCurrentUser": zod.boolean().optional()
+})).nullish(),
+  "Code": zod.number().optional(),
+  "errors": zod.array(zod.string()).nullish(),
+  "timestamp": zod.string().datetime({}).optional(),
+  "metadata": zod.any().nullish()
+})
+
+export const getApiV1PostCommunityCommunityIdPostIdParams = zod.object({
+  "communityId": zod.number(),
+  "postId": zod.number()
+})
+
+export const getApiV1PostCommunityCommunityIdPostIdResponse = zod.object({
+  "success": zod.boolean().optional(),
+  "message": zod.string().nullish(),
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "userId": zod.number().optional(),
+  "categoryId": zod.number().nullish(),
+  "description": zod.string().nullish(),
+  "videoUrl": zod.string().nullish(),
+  "userImageUrl": zod.string().nullish(),
+  "username": zod.string().nullish(),
+  "isPublic": zod.boolean().optional(),
+  "uploadedAt": zod.string().datetime({}).optional(),
+  "likeCount": zod.number().optional(),
+  "commentCount": zod.number().optional(),
+  "likedByCurrentUser": zod.boolean().optional()
+}).optional(),
+  "Code": zod.number().optional(),
+  "errors": zod.array(zod.string()).nullish(),
+  "timestamp": zod.string().datetime({}).optional(),
+  "metadata": zod.any().nullish()
+})
+
+export const patchApiV1PostCommunityCommunityIdPostIdParams = zod.object({
+  "communityId": zod.number(),
+  "postId": zod.number()
+})
+
+export const patchApiV1PostCommunityCommunityIdPostIdBody = zod.object({
+  "categoryId": zod.number(),
+  "description": zod.string().min(1),
+  "videoUrl": zod.string().nullish(),
+  "isPublic": zod.boolean()
+})
+
+export const patchApiV1PostCommunityCommunityIdPostIdResponse = zod.object({
+  "success": zod.boolean().optional(),
+  "message": zod.string().nullish(),
+  "data": zod.object({
+  "id": zod.number().optional(),
+  "userId": zod.number().optional(),
+  "categoryId": zod.number().nullish(),
+  "description": zod.string().nullish(),
+  "videoUrl": zod.string().nullish(),
+  "userImageUrl": zod.string().nullish(),
+  "username": zod.string().nullish(),
+  "isPublic": zod.boolean().optional(),
+  "uploadedAt": zod.string().datetime({}).optional(),
+  "likeCount": zod.number().optional(),
+  "commentCount": zod.number().optional(),
+  "likedByCurrentUser": zod.boolean().optional()
+}).optional(),
+  "Code": zod.number().optional(),
+  "errors": zod.array(zod.string()).nullish(),
+  "timestamp": zod.string().datetime({}).optional(),
+  "metadata": zod.any().nullish()
+})
+
+export const deleteApiV1PostCommunityCommunityIdPostIdParams = zod.object({
+  "communityId": zod.number(),
+  "postId": zod.number()
+})
+
+export const deleteApiV1PostCommunityCommunityIdPostIdResponse = zod.object({
+  "success": zod.boolean().optional(),
+  "message": zod.string().nullish(),
+  "data": zod.boolean().optional(),
+  "Code": zod.number().optional(),
+  "errors": zod.array(zod.string()).nullish(),
+  "timestamp": zod.string().datetime({}).optional(),
+  "metadata": zod.any().nullish()
+})
+
+export const getApiV1PostCommunityCommunityIdUserTargetUserIdParams = zod.object({
+  "communityId": zod.number(),
+  "targetUserId": zod.number()
+})
+
+export const getApiV1PostCommunityCommunityIdUserTargetUserIdResponse = zod.object({
+  "success": zod.boolean().optional(),
+  "message": zod.string().nullish(),
+  "data": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "userId": zod.number().optional(),
+  "categoryId": zod.number().nullish(),
+  "description": zod.string().nullish(),
+  "videoUrl": zod.string().nullish(),
+  "userImageUrl": zod.string().nullish(),
+  "username": zod.string().nullish(),
+  "isPublic": zod.boolean().optional(),
+  "uploadedAt": zod.string().datetime({}).optional(),
+  "likeCount": zod.number().optional(),
+  "commentCount": zod.number().optional(),
+  "likedByCurrentUser": zod.boolean().optional()
+})).nullish(),
   "Code": zod.number().optional(),
   "errors": zod.array(zod.string()).nullish(),
   "timestamp": zod.string().datetime({}).optional(),

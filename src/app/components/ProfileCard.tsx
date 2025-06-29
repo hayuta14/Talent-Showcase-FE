@@ -48,15 +48,15 @@ export default function ProfileCard() {
       <Divider className="my-4 w-full" />
       <Stack direction="row" spacing={4} className="w-full justify-center">
         <Box className="text-center">
-          <Typography variant="subtitle1" className="font-bold">256</Typography>
+          <Typography variant="subtitle1" className="font-bold">{profile.postCount ?? (profile.posts?.length ?? '-')}</Typography>
           <Typography variant="caption" color="text.secondary">Post</Typography>
         </Box>
         <Box className="text-center">
-          <Typography variant="subtitle1" className="font-bold">2.5K</Typography>
+          <Typography variant="subtitle1" className="font-bold">{profile.followerCount ?? '-'}</Typography>
           <Typography variant="caption" color="text.secondary">Followers</Typography>
         </Box>
         <Box className="text-center">
-          <Typography variant="subtitle1" className="font-bold">365</Typography>
+          <Typography variant="subtitle1" className="font-bold">{profile.followingCount ?? '-'}</Typography>
           <Typography variant="caption" color="text.secondary">Following</Typography>
         </Box>
       </Stack>
