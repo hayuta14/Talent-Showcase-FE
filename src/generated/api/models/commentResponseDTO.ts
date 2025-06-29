@@ -5,6 +5,7 @@
  * API for Talent Show Case application
  * OpenAPI spec version: v1
  */
+import type { SubCommentResponseDTO } from './subCommentResponseDTO';
 
 export interface CommentResponseDTO {
   id?: number;
@@ -16,4 +17,6 @@ export interface CommentResponseDTO {
   /** @nullable */
   content?: string | null;
   createdAt?: string;
+  /** @nullable */
+  subComments?: SubCommentResponseDTO[] | null;
 }

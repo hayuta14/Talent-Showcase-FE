@@ -5,6 +5,8 @@
  * API for Talent Show Case application
  * OpenAPI spec version: v1
  */
+import type { PostResponseDTO } from './postResponseDTO';
+import type { TalentCategoryProfileDTO } from './talentCategoryProfileDTO';
 
 export interface UserResponseDTO {
   /** @nullable */
@@ -19,4 +21,11 @@ export interface UserResponseDTO {
   contactInfo?: string | null;
   /** @nullable */
   profilePictureUrl?: string | null;
+  /** @nullable */
+  posts?: PostResponseDTO[] | null;
+  /** @nullable */
+  talentCategories?: TalentCategoryProfileDTO[] | null;
+  postCount?: number;
+  followerCount?: number;
+  followingCount?: number;
 }

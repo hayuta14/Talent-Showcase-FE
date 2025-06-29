@@ -13,6 +13,8 @@ import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import { useFeedStore } from '@/stores/feedStore';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { SubCommentResponseDTO } from '@/generated/api/models/subCommentResponseDTO';
+import ReplyIcon from '@mui/icons-material/Reply';
 dayjs.extend(relativeTime);
 
 const PAGE_SIZE = 5;
@@ -49,7 +51,9 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
       setPosts((prev: any[]) => {
         // Avoid duplicate posts
         const ids = new Set(prev.map(p => p.id));
-        return [...prev, ...newPosts.filter(p => !ids.has(p.id))];
+        const merged = [...prev, ...newPosts.filter(p => !ids.has(p.id))];
+        // Sort by uploadedAt descending (newest first)
+        return merged.sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime());
       });
       if (!newPosts.length || newPosts.length < PAGE_SIZE) setHasMore(false);
     } catch {
@@ -158,6 +162,9 @@ function FeedInner({ posts, loader, loading, hasMore }: { posts: any[]; loader: 
   const [commentPostId, setCommentPostId] = useState<number | null>(null);
   const [commentInput, setCommentInput] = useState('');
   const [sending, setSending] = useState(false);
+
+  // Thêm state để theo dõi comment nào đang mở form trả lời
+  const [replyOpenCommentId, setReplyOpenCommentId] = useState<number | null>(null);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, postId: number) => {
     setAnchorEl(event.currentTarget);
@@ -419,12 +426,78 @@ function FeedInner({ posts, loader, loading, hasMore }: { posts: any[]; loader: 
             <Stack spacing={2} sx={{ maxHeight: 400, overflowY: 'auto' }}>
               {comments.length === 0 && <Typography color="text.secondary">No comments yet.</Typography>}
               {comments.map(comment => (
-                <Box key={comment.id} display="flex" alignItems="flex-start" gap={2}>
-                  <Avatar src={comment.userImageUrl || undefined} />
-                  <Box>
-                    <Typography fontWeight="bold">{comment.username}</Typography>
-                    <Typography variant="body2" color="text.secondary">{comment.createdAt && dayjs(comment.createdAt).fromNow()}</Typography>
-                    <Typography>{comment.content}</Typography>
+                <Box
+                  key={comment.id}
+                  sx={{
+                    position: 'relative',
+                    bgcolor: '#fff',
+                    borderRadius: 3,
+                    p: 1.5,
+                    mb: 1,
+                    '&:hover .comment-actions': { opacity: 1 }
+                  }}
+                  display="flex"
+                  alignItems="flex-start"
+                  gap={1.5}
+                >
+                  <Avatar src={comment.userImageUrl || undefined} sx={{ width: 36, height: 36 }} />
+                  <Box flex={1}>
+                    <Box display="flex" alignItems="center" gap={1}>
+                      <Typography fontWeight="bold" color="#222">{comment.username}</Typography>
+                      <Typography variant="body2" color="text.secondary">{comment.createdAt && dayjs(comment.createdAt).fromNow()}</Typography>
+                    </Box>
+                    <Typography color="#222">{comment.content}</Typography>
+                    <Box display="flex" alignItems="center" gap={2} mt={0.5}>
+                      <Typography variant="caption" color="#aaa" sx={{ cursor: 'pointer' }}>Like</Typography>
+                      <Typography variant="caption" color="#aaa" sx={{ cursor: 'pointer' }} onClick={() => setReplyOpenCommentId(comment.id)}>Reply</Typography>
+                      <Typography variant="caption" color="#aaa">{comment.createdAt && dayjs(comment.createdAt).fromNow()}</Typography>
+                    </Box>
+                    {/* Subcomments */}
+                    <Box ml={5} mt={1}>
+                      {comment.subComments?.length > 0 && comment.subComments.map((sub: SubCommentResponseDTO, idx: number) => (
+                        <Box
+                          key={idx}
+                          sx={{
+                            bgcolor: '#f5f6fa',
+                            borderRadius: 2,
+                            p: 1,
+                            mb: 0.5,
+                            display: 'flex',
+                            alignItems: 'flex-start',
+                            gap: 1.2,
+                            fontSize: '0.95em'
+                          }}
+                        >
+                          <Avatar src={sub.userImageUrl || undefined} sx={{ width: 28, height: 28 }} />
+                          <Box>
+                            <Typography fontWeight="bold" color="#222" fontSize="0.97em">{sub.username || sub.userId}</Typography>
+                            <Typography variant="body2" color="text.secondary" fontSize="0.85em">{sub.createdAt && dayjs(sub.createdAt).fromNow()}</Typography>
+                            <Typography color="#222" fontSize="0.97em">{sub.content}</Typography>
+                          </Box>
+                        </Box>
+                      ))}
+                      {/* Chỉ hiện form trả lời nếu comment này đang được mở */}
+                      {replyOpenCommentId === comment.id && (
+                        <Box mt={1} p={1} bgcolor="#f5f5f5" borderRadius={2} maxWidth={400}>
+                          <ReplyForm commentId={comment.id} onReplied={() => { handleOpenComments(commentPostId!); setReplyOpenCommentId(null); }} />
+                        </Box>
+                      )}
+                    </Box>
+                  </Box>
+                  {/* Dấu ba chấm, chỉ hiện khi hover */}
+                  <Box
+                    className="comment-actions"
+                    sx={{
+                      position: 'absolute',
+                      top: 8,
+                      right: 8,
+                      opacity: 0,
+                      transition: 'opacity 0.2s'
+                    }}
+                  >
+                    <IconButton size="small" onClick={e => handleMenuOpen(e, comment.id)}>
+                      <MoreVertIcon sx={{ color: '#222' }} />
+                    </IconButton>
                   </Box>
                 </Box>
               ))}
@@ -452,6 +525,39 @@ function FeedInner({ posts, loader, loading, hasMore }: { posts: any[]; loader: 
       {loading && <Box className="flex justify-center"><CircularProgress /></Box>}
       {!hasMore && !loading && <Box className="text-center text-gray-400">No more posts</Box>}
     </Stack>
+  );
+}
+
+function ReplyForm({ commentId, onReplied }: { commentId: number, onReplied: () => void }) {
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const handleReply = async () => {
+    if (!input.trim()) return;
+    setLoading(true);
+    try {
+      const api = getPost();
+      await api.postApiV1PostCommentCommentIdSubComment(commentId, input);
+      setInput('');
+      onReplied();
+    } finally {
+      setLoading(false);
+    }
+  };
+  return (
+    <Box display="flex" alignItems="center" gap={1} mt={1}>
+      <TextField
+        value={input}
+        onChange={e => setInput(e.target.value)}
+        placeholder="Trả lời..."
+        size="small"
+        multiline
+        minRows={1}
+        maxRows={3}
+      />
+      <Button onClick={handleReply} disabled={loading || !input.trim()} variant="outlined" size="small">
+        Gửi
+      </Button>
+    </Box>
   );
 }
 

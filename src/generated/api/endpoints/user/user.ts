@@ -6,7 +6,7 @@
  * OpenAPI spec version: v1
  */
 import type {
-  UserProfileDTO,
+  CreateUserProfileDTO,
   UserProfileDTOApiResponse,
   UserResponseDTOApiResponse
 } from '../../models';
@@ -28,18 +28,30 @@ const getApiV1UserGetProfile = (
       );
     }
   /**
+ * @summary Get user profile information by user ID
+ */
+const getApiV1UserGetProfileUserId = (
+    userId: number,
+ ) => {
+      return api<UserResponseDTOApiResponse>(
+      {url: `/api/v1/User/get-profile/${userId}`, method: 'GET'
+    },
+      );
+    }
+  /**
  * @summary Create or update user profile
  */
 const patchApiV1UserCreateProfile = (
-    userProfileDTO: UserProfileDTO,
+    createUserProfileDTO: CreateUserProfileDTO,
  ) => {
       return api<UserProfileDTOApiResponse>(
       {url: `/api/v1/User/create-profile`, method: 'PATCH',
       headers: {'Content-Type': 'application/json', },
-      data: userProfileDTO
+      data: createUserProfileDTO
     },
       );
     }
-  return {getApiV1UserGetProfile,patchApiV1UserCreateProfile}};
+  return {getApiV1UserGetProfile,getApiV1UserGetProfileUserId,patchApiV1UserCreateProfile}};
 export type GetApiV1UserGetProfileResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getUser>['getApiV1UserGetProfile']>>>
+export type GetApiV1UserGetProfileUserIdResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getUser>['getApiV1UserGetProfileUserId']>>>
 export type PatchApiV1UserCreateProfileResult = NonNullable<Awaited<ReturnType<ReturnType<typeof getUser>['patchApiV1UserCreateProfile']>>>

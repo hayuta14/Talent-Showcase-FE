@@ -5,9 +5,12 @@ import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import ProfileCard from './components/ProfileCard';
 import ShareBox from './components/ShareBox';
-import FeedProvider from './components/Feed';
+import dynamic from 'next/dynamic';
+import { Suspense } from 'react';
 import WhoToFollow from './components/WhoToFollow';
 import News from './components/News';
+
+const FeedProvider = dynamic(() => import('./components/Feed'), { ssr: false });
 
 export default function Home() {
 
@@ -24,9 +27,11 @@ export default function Home() {
         </Grid>
         {/* Main Content */}
         <Grid size={{ xs: 12, md: 6 }}>
-          <FeedProvider>
-            <ShareBox />
-          </FeedProvider>
+          <Suspense fallback={<div style={{textAlign:'center',padding:'2rem'}}><span>Loading feed...</span></div>}>
+            <FeedProvider>
+              <ShareBox />
+            </FeedProvider>
+          </Suspense>
         </Grid>
         {/* Right Sidebar */}
         <Grid size={{ xs: 12, md: 3 }}>

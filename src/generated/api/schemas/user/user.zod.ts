@@ -22,7 +22,75 @@ export const getApiV1UserGetProfileResponse = zod.object({
   "bio": zod.string().nullish(),
   "skill": zod.string().nullish(),
   "contactInfo": zod.string().nullish(),
-  "profilePictureUrl": zod.string().nullish()
+  "profilePictureUrl": zod.string().nullish(),
+  "posts": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "userId": zod.number().optional(),
+  "categoryId": zod.number().nullish(),
+  "description": zod.string().nullish(),
+  "videoUrl": zod.string().nullish(),
+  "userImageUrl": zod.string().nullish(),
+  "username": zod.string().nullish(),
+  "isPublic": zod.boolean().optional(),
+  "uploadedAt": zod.string().datetime({}).optional(),
+  "likeCount": zod.number().optional(),
+  "commentCount": zod.number().optional(),
+  "likedByCurrentUser": zod.boolean().optional()
+})).nullish(),
+  "talentCategories": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().nullish(),
+  "level": zod.string().nullish()
+})).nullish(),
+  "postCount": zod.number().optional(),
+  "followerCount": zod.number().optional(),
+  "followingCount": zod.number().optional()
+}).optional(),
+  "Code": zod.number().optional(),
+  "errors": zod.array(zod.string()).nullish(),
+  "timestamp": zod.string().datetime({}).optional(),
+  "metadata": zod.any().nullish()
+})
+
+/**
+ * @summary Get user profile information by user ID
+ */
+export const getApiV1UserGetProfileUserIdParams = zod.object({
+  "userId": zod.number().describe('The ID of the user whose profile to retrieve')
+})
+
+export const getApiV1UserGetProfileUserIdResponse = zod.object({
+  "success": zod.boolean().optional(),
+  "message": zod.string().nullish(),
+  "data": zod.object({
+  "username": zod.string().nullish(),
+  "email": zod.string().nullish(),
+  "bio": zod.string().nullish(),
+  "skill": zod.string().nullish(),
+  "contactInfo": zod.string().nullish(),
+  "profilePictureUrl": zod.string().nullish(),
+  "posts": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "userId": zod.number().optional(),
+  "categoryId": zod.number().nullish(),
+  "description": zod.string().nullish(),
+  "videoUrl": zod.string().nullish(),
+  "userImageUrl": zod.string().nullish(),
+  "username": zod.string().nullish(),
+  "isPublic": zod.boolean().optional(),
+  "uploadedAt": zod.string().datetime({}).optional(),
+  "likeCount": zod.number().optional(),
+  "commentCount": zod.number().optional(),
+  "likedByCurrentUser": zod.boolean().optional()
+})).nullish(),
+  "talentCategories": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().nullish(),
+  "level": zod.string().nullish()
+})).nullish(),
+  "postCount": zod.number().optional(),
+  "followerCount": zod.number().optional(),
+  "followingCount": zod.number().optional()
 }).optional(),
   "Code": zod.number().optional(),
   "errors": zod.array(zod.string()).nullish(),
@@ -34,11 +102,14 @@ export const getApiV1UserGetProfileResponse = zod.object({
  * @summary Create or update user profile
  */
 export const patchApiV1UserCreateProfileBody = zod.object({
-  "username": zod.string().min(1),
-  "bio": zod.string().min(1),
-  "skill": zod.string().min(1),
-  "imageUrl": zod.string().min(1),
-  "contactInfo": zod.string().min(1)
+  "username": zod.string().nullish(),
+  "bio": zod.string().nullish(),
+  "talentCategories": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "level": zod.string().nullish()
+})).nullish(),
+  "imageUrl": zod.string().nullish(),
+  "contactInfo": zod.string().nullish()
 })
 
 export const patchApiV1UserCreateProfileResponse = zod.object({
@@ -47,7 +118,11 @@ export const patchApiV1UserCreateProfileResponse = zod.object({
   "data": zod.object({
   "username": zod.string().min(1),
   "bio": zod.string().min(1),
-  "skill": zod.string().min(1),
+  "talentCategories": zod.array(zod.object({
+  "id": zod.number().optional(),
+  "name": zod.string().nullish(),
+  "level": zod.string().nullish()
+})),
   "imageUrl": zod.string().min(1),
   "contactInfo": zod.string().min(1)
 }).optional(),
