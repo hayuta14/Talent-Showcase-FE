@@ -43,6 +43,11 @@ export default function RegisterPage() {
     }
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setRegisterData(prevData => ({ ...prevData, [name]: value }));
+  };
+
   return (
     <Box
       sx={{
@@ -83,7 +88,8 @@ export default function RegisterPage() {
               label="Full Name"
               variant="outlined"
               value={registerData.username}
-              onChange={e => setRegisterData(d => ({ ...d, username: e.target.value }))}
+              onChange={handleInputChange}
+              name="username"
             />
             <TextField
               fullWidth
@@ -91,7 +97,8 @@ export default function RegisterPage() {
               type="email"
               variant="outlined"
               value={registerData.email}
-              onChange={e => setRegisterData(d => ({ ...d, email: e.target.value }))}
+              onChange={handleInputChange}
+              name="email"
             />
             <TextField
               fullWidth
@@ -99,7 +106,8 @@ export default function RegisterPage() {
               type="password"
               variant="outlined"
               value={registerData.password}
-              onChange={e => setRegisterData(d => ({ ...d, password: e.target.value }))}
+              onChange={handleInputChange}
+              name="password"
             />
             <TextField
               fullWidth
@@ -107,14 +115,16 @@ export default function RegisterPage() {
               type="password"
               variant="outlined"
               value={registerData.confirmPassword}
-              onChange={e => setRegisterData(d => ({ ...d, confirmPassword: e.target.value }))}
+              onChange={handleInputChange}
+              name="confirmPassword"
             />
             <TextField
               fullWidth
               label="Phone Number"
               variant="outlined"
               value={registerData.phoneNumber}
-              onChange={e => setRegisterData(d => ({ ...d, phoneNumber: e.target.value }))}
+              onChange={handleInputChange}
+              name="phoneNumber"
             />
             {registerError && <Typography color="error">{registerError}</Typography>}
             {registerSuccess && <Typography color="primary">{registerSuccess}</Typography>}

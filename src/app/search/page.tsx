@@ -76,12 +76,12 @@ export default function SearchPage() {
           // Log cấu trúc thực tế
           console.log('Category API response:', res);
           let cats: any[] = [];
-          if (Array.isArray(res.data)) {
-            cats = res.data;
-          } else if (res.data && Array.isArray(res.data.data)) {
-            cats = res.data.data;
-          } else if (res.data && res.data.data && Array.isArray(res.data.data.data)) {
-            cats = res.data.data.data;
+          if (res && typeof res === 'object' && 'data' in res && Array.isArray((res as any).data)) {
+            cats = (res as any).data;
+          } else if (res && typeof res === 'object' && 'data' in res && (res as any).data && typeof (res as any).data === 'object' && 'data' in (res as any).data && Array.isArray((res as any).data.data)) {
+            cats = (res as any).data.data;
+          } else if (res && typeof res === 'object' && 'data' in res && (res as any).data && typeof (res as any).data === 'object' && 'data' in (res as any).data && (res as any).data.data && typeof (res as any).data.data === 'object' && 'data' in (res as any).data.data && Array.isArray((res as any).data.data.data)) {
+            cats = (res as any).data.data.data;
           }
           setCategories(cats.map((c: any) => ({ id: c.id, name: c.name })));
         } catch (e) {
@@ -104,12 +104,14 @@ export default function SearchPage() {
           const res = await api.getApiV1Category({ page: 1, pageSize: 100 });
           console.log(res);
           let arr: any[] = [];
-          if (Array.isArray(res.data.items)) {
-            arr = res.data.items;
-          } else if (res.data && Array.isArray(res.data.data)) {
-            arr = res.data.data;
-          } else if (res.data && res.data.data && Array.isArray(res.data.data.data)) {
-            arr = res.data.data.data;
+          if (res && typeof res === 'object' && 'data' in res && (res as any).data && typeof (res as any).data === 'object' && 'items' in (res as any).data && Array.isArray((res as any).data.items)) {
+            arr = (res as any).data.items;
+          } else if (res && typeof res === 'object' && 'data' in res && Array.isArray((res as any).data)) {
+            arr = (res as any).data;
+          } else if (res && typeof res === 'object' && 'data' in res && (res as any).data && typeof (res as any).data === 'object' && 'data' in (res as any).data && Array.isArray((res as any).data.data)) {
+            arr = (res as any).data.data;
+          } else if (res && typeof res === 'object' && 'data' in res && (res as any).data && typeof (res as any).data === 'object' && 'data' in (res as any).data && (res as any).data.data && typeof (res as any).data.data === 'object' && 'data' in (res as any).data.data && Array.isArray((res as any).data.data.data)) {
+            arr = (res as any).data.data.data;
           }
           setTalents(arr.map((t: any) => ({ id: t.id, title: t.name })));
         } catch {

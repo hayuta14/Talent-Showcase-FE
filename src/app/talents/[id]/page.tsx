@@ -1,6 +1,7 @@
 'use client';
 
-import { Container, Box, Typography, Paper, Grid, Button } from '@mui/material';
+import { Container, Box, Typography, Paper, Button } from '@mui/material';
+import Grid from '@mui/material/Grid';
 import { useParams } from 'next/navigation';
 
 // Mock data - in real app, this would come from an API
@@ -23,7 +24,8 @@ const talentDetails = {
 export default function TalentDetailPage() {
   const params = useParams();
   const talentId = Number(params.id);
-  const talent = talentDetails[talentId];
+  const key = String(talentId) as unknown as keyof typeof talentDetails;
+  const talent = Object.prototype.hasOwnProperty.call(talentDetails, key) ? talentDetails[key] : undefined;
 
   if (!talent) {
     return (

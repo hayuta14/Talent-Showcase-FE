@@ -2,8 +2,16 @@
 
 import { createContext, useContext, useState, ReactNode } from 'react';
 
+// Define a User type for the context
+interface User {
+  name: string;
+  email: string;
+  avatar: string;
+  role: string;
+}
+
 interface AuthContextType {
-  user: any | null;
+  user: User | null;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
 }
@@ -11,7 +19,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<any | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   const login = async (email: string, password: string) => {
     try {

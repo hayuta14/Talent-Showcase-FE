@@ -5,9 +5,12 @@ import type { UserSuggestionDTO } from '@/generated/api/models/userSuggestionDTO
 import CircularProgress from '@mui/material/CircularProgress';
 import { useRouter } from 'next/navigation';
 
+// Extend UserSuggestionDTO locally to include 'followed'
+type SuggestionWithFollow = UserSuggestionDTO & { followed: boolean };
+
 export default function WhoToFollow() {
   const router = useRouter();
-  const [suggestions, setSuggestions] = useState<UserSuggestionDTO[]>([]);
+  const [suggestions, setSuggestions] = useState<SuggestionWithFollow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [followLoading, setFollowLoading] = useState<number | null>(null);
@@ -19,7 +22,8 @@ export default function WhoToFollow() {
       try {
         const api = getFollower();
         const res = await api.getApiV1FollowerSuggested({ topN: 5 });
-        setSuggestions(res);
+        // Add 'followed: false' to each suggestion
+        setSuggestions(res.map((s: UserSuggestionDTO) => ({ ...s, followed: false })));
       } catch {
         setError('Failed to load suggestions');
       } finally {
