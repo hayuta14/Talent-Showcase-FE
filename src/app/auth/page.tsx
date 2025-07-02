@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Container, Box, Typography, TextField, Button, Paper, Tab, Tabs } from '@mui/material';
+import { Container, Box, Typography, TextField, Button, Paper } from '@mui/material';
 import { getAuth } from '@/generated/api/endpoints/auth/auth';
 import { useAuthStore } from '@/stores/authStore';
 import { useRouter } from 'next/navigation';
@@ -27,7 +27,7 @@ export default function AuthPage() {
   const [registerError, setRegisterError] = useState('');
   const [registerSuccess, setRegisterSuccess] = useState('');
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setError('');
@@ -73,6 +73,10 @@ export default function AuthPage() {
     } finally {
       setRegisterLoading(false);
     }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Implementation of handleInputChange function
   };
 
   return (

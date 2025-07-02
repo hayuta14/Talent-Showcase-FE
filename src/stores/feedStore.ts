@@ -1,12 +1,31 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+// Define a Post type (customize as needed)
+export interface Post {
+  id: number;
+  username: string;
+  content: string;
+  likeCount?: number;
+  likedByCurrentUser?: boolean;
+  commentCount?: number;
+  userImageUrl?: string;
+  uploadedAt?: string;
+  userId?: number;
+  description?: string;
+  image?: string;
+  videoUrl?: string;
+  categoryId?: number;
+  isPublic?: boolean;
+  // Add other fields as needed
+}
+
 interface FeedState {
-  posts: any[];
+  posts: Post[];
   page: number;
   hasMore: boolean;
   loading: boolean;
-  setPosts: (posts: any[] | ((prev: any[]) => any[])) => void;
+  setPosts: (posts: Post[] | ((prev: Post[]) => Post[])) => void;
   setPage: (page: number | ((prev: number) => number)) => void;
   setHasMore: (hasMore: boolean) => void;
   setLoading: (loading: boolean) => void;
@@ -21,7 +40,7 @@ export const useFeedStore = create<FeedState>()(
       loading: false,
       setPosts: (posts) =>
         set((state) => ({
-          posts: typeof posts === 'function' ? (posts as (prev: any[]) => any[])(state.posts) : posts,
+          posts: typeof posts === 'function' ? (posts as (prev: Post[]) => Post[])(state.posts) : posts,
         })),
       setPage: (page) =>
         set((state) => ({

@@ -1,10 +1,9 @@
-import { useEffect, useRef, useState, createContext, useContext } from 'react';
+import { useEffect, useRef, useState, createContext } from 'react';
 import { Avatar, Box, Typography, Paper, Stack, CircularProgress, Menu, MenuItem, IconButton, Dialog, DialogTitle, DialogContent, TextField, DialogActions, Alert, Button, FormControlLabel, Checkbox } from '@mui/material';
 import { getPost } from '@/generated/api/endpoints/post/post';
 import { getMedia } from '@/generated/api/endpoints/media/media';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useAuthStore } from '@/stores/authStore';
-import { useUserStore } from '@/stores/useUserStore';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import PublicIcon from '@mui/icons-material/Public';
 import { getCategory } from '@/generated/api/endpoints/category/category';
@@ -14,14 +13,24 @@ import { useFeedStore } from '@/stores/feedStore';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { SubCommentResponseDTO } from '@/generated/api/models/subCommentResponseDTO';
-import ReplyIcon from '@mui/icons-material/Reply';
+import type { Post } from '@/stores/feedStore';
 dayjs.extend(relativeTime);
 
 const PAGE_SIZE = 5;
 
 export const FeedContext = createContext({
-  addPost: (post: any) => {},
+  addPost: (post: Post) => {},
 });
+
+// Define a Comment type for comments
+interface Comment {
+  id: number;
+  username: string;
+  userImageUrl?: string;
+  content: string;
+  createdAt?: string;
+  subComments?: SubCommentResponseDTO[];
+}
 
 export function FeedProvider({ children }: { children: React.ReactNode }) {
   const posts = useFeedStore(s => s.posts);
@@ -33,11 +42,6 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
   const loading = useFeedStore(s => s.loading);
   const setLoading = useFeedStore(s => s.setLoading);
   const loader = useRef<HTMLDivElement>(null);
-
-  const currentUserId = useAuthStore(s => s.user?.nameid);
-  const currentUserImageUrl = useAuthStore(s => s.user?.userImageUrl);
-
-  const [isFirstLoad, setIsFirstLoad] = useState(true);
 
   // Load posts from API (lazy loading)
   const loadPosts = async (pageNum: number) => {
@@ -110,30 +114,31 @@ export function FeedProvider({ children }: { children: React.ReactNode }) {
     // eslint-disable-next-line
   }, []);
 
-  const addPost = (post: any) => {
-    setPosts((prev: any[]) => [post, ...prev]);
+  const addPost = (post: Post) => {
+    setPosts((prev) => [post, ...prev]);
   };
 
   return (
     <FeedContext.Provider value={{ addPost }}>
       {children}
-      <FeedInner posts={posts} loader={loader} loading={loading} hasMore={hasMore} />
+      <FeedInner posts={posts} loading={loading} hasMore={hasMore} />
+      <div ref={loader} />
     </FeedContext.Provider>
   );
 }
 
-function FeedInner({ posts, loader, loading, hasMore }: { posts: any[]; loader: any; loading: boolean; hasMore: boolean }) {
-  const currentUserId = useAuthStore(s => s.user?.nameid);
-  const currentUserImageUrl = useAuthStore(s => s.user?.userImageUrl);
+function FeedInner({ posts, loading, hasMore }: { posts: Post[]; loading: boolean; hasMore: boolean }) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [menuPostId, setMenuPostId] = useState<number | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [feedPosts, setFeedPosts] = useState(posts);
+  const currentUserId = useAuthStore(s => s.user?.nameid);
+  const currentUserImageUrl = useAuthStore(s => s.user?.userImageUrl);
   useEffect(() => { setFeedPosts(posts); }, [posts]);
 
   // Edit post popup state
   const [editOpen, setEditOpen] = useState(false);
-  const [editPost, setEditPost] = useState<any>(null);
+  const [editPost, setEditPost] = useState<Post | null>(null);
   const [editLoading, setEditLoading] = useState(false);
   const [editError, setEditError] = useState('');
 
@@ -158,7 +163,7 @@ function FeedInner({ posts, loader, loading, hasMore }: { posts: any[]; loader: 
   // Comment popup state
   const [commentOpen, setCommentOpen] = useState(false);
   const [commentLoading, setCommentLoading] = useState(false);
-  const [comments, setComments] = useState<any[]>([]);
+  const [comments, setComments] = useState<Comment[]>([]);
   const [commentPostId, setCommentPostId] = useState<number | null>(null);
   const [commentInput, setCommentInput] = useState('');
   const [sending, setSending] = useState(false);
@@ -190,7 +195,7 @@ function FeedInner({ posts, loader, loading, hasMore }: { posts: any[]; loader: 
   };
   // Handle edit
   const handleEdit = () => {
-    const post = feedPosts.find(p => p.id === menuPostId);
+    const post = feedPosts.find(p => p.id === menuPostId) || null;
     setEditPost(post);
     setEditOpen(true);
     handleMenuClose();
@@ -244,9 +249,16 @@ function FeedInner({ posts, loader, loading, hasMore }: { posts: any[]; loader: 
     try {
       const api = getPost();
       const res = await api.getApiV1PostPostIdComments(postId);
-      let newComments: any[] = [];
+      let newComments: Comment[] = [];
       if (res.data && typeof res.data === 'object' && Array.isArray((res.data as any).comments)) {
-        newComments = (res.data as any).comments;
+        newComments = (res.data as any).comments.map((comment: any) => ({
+          id: comment.id,
+          username: comment.username,
+          userImageUrl: comment.userImageUrl,
+          content: comment.content,
+          createdAt: comment.createdAt,
+          subComments: comment.subComments,
+        }));
       }
       setComments(newComments);
     } finally {
@@ -267,9 +279,16 @@ function FeedInner({ posts, loader, loading, hasMore }: { posts: any[]; loader: 
       await api.postApiV1PostComment({ postId: commentPostId, content: commentInput });
       // Reload comments
       const res = await api.getApiV1PostPostIdComments(commentPostId);
-      let newComments: any[] = [];
+      let newComments: Comment[] = [];
       if (res.data && typeof res.data === 'object' && Array.isArray((res.data as any).comments)) {
-        newComments = (res.data as any).comments;
+        newComments = (res.data as any).comments.map((comment: any) => ({
+          id: comment.id,
+          username: comment.username,
+          userImageUrl: comment.userImageUrl,
+          content: comment.content,
+          createdAt: comment.createdAt,
+          subComments: comment.subComments,
+        }));
       }
       setComments(newComments);
       setCommentInput('');
@@ -344,7 +363,7 @@ function FeedInner({ posts, loader, loading, hasMore }: { posts: any[]; loader: 
             multiline
             minRows={2}
             value={editPost?.description || ''}
-            onChange={e => setEditPost({ ...editPost, description: e.target.value })}
+            onChange={e => editPost && setEditPost({ ...editPost, description: e.target.value })}
             sx={{ mt: 2 }}
           />
           <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -367,7 +386,7 @@ function FeedInner({ posts, loader, loading, hasMore }: { posts: any[]; loader: 
               select
               label="Category"
               value={editPost?.categoryId || (categories[0]?.id || 1)}
-              onChange={e => setEditPost({ ...editPost, categoryId: Number(e.target.value) })}
+              onChange={e => editPost && setEditPost({ ...editPost, categoryId: Number(e.target.value) })}
               fullWidth
             >
               {categories.map((cat) => (
@@ -380,7 +399,7 @@ function FeedInner({ posts, loader, loading, hasMore }: { posts: any[]; loader: 
               control={
                 <Checkbox
                   checked={!!editPost?.isPublic}
-                  onChange={e => setEditPost({ ...editPost, isPublic: e.target.checked })}
+                  onChange={e => editPost && setEditPost({ ...editPost, isPublic: e.target.checked })}
                   icon={<PublicIcon />}
                   checkedIcon={<PublicIcon color="primary" />}
                 />
@@ -393,14 +412,15 @@ function FeedInner({ posts, loader, loading, hasMore }: { posts: any[]; loader: 
           <Button onClick={() => setEditOpen(false)} color="secondary">Cancel</Button>
           <Button
             onClick={async () => {
+              if (!editPost) return;
               setEditLoading(true);
               setEditError('');
               try {
                 const api = getPost();
                 await api.patchApiV1PostId(editPost.id, {
-                  description: editPost.description,
-                  categoryId: editPost.categoryId,
-                  isPublic: editPost.isPublic,
+                  description: editPost.description ?? '',
+                  categoryId: editPost.categoryId ?? 1,
+                  isPublic: editPost.isPublic ?? true,
                   videoUrl: editPost.videoUrl || '',
                 });
                 setFeedPosts(prev => prev.map(p => p.id === editPost.id ? { ...p, ...editPost } : p));
@@ -454,7 +474,7 @@ function FeedInner({ posts, loader, loading, hasMore }: { posts: any[]; loader: 
                     </Box>
                     {/* Subcomments */}
                     <Box ml={5} mt={1}>
-                      {comment.subComments?.length > 0 && comment.subComments.map((sub: SubCommentResponseDTO, idx: number) => (
+                      {(comment.subComments?.length ?? 0) > 0 && (comment.subComments ?? []).map((sub: SubCommentResponseDTO, idx: number) => (
                         <Box
                           key={idx}
                           sx={{
@@ -521,8 +541,6 @@ function FeedInner({ posts, loader, loading, hasMore }: { posts: any[]; loader: 
           </Box>
         </DialogContent>
       </Dialog>
-      <div ref={loader} />
-      {loading && <Box className="flex justify-center"><CircularProgress /></Box>}
       {!hasMore && !loading && <Box className="text-center text-gray-400">No more posts</Box>}
     </Stack>
   );

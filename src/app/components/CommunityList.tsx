@@ -2,6 +2,20 @@ import { List, ListItem, ListItemButton, Avatar, Chip, Typography, Button, Circu
 import GroupIcon from '@mui/icons-material/Group';
 import PeopleIcon from '@mui/icons-material/People';
 
+interface Group {
+  id?: number;
+  communityId?: number;
+  title?: string;
+  name?: string;
+  description?: string;
+  additionalData?: {
+    memberCount?: number;
+    memberRole?: string;
+    isMember?: boolean;
+  };
+  createdAt?: string;
+}
+
 export default function CommunityList({
   groups,
   onJoin,
@@ -12,7 +26,7 @@ export default function CommunityList({
   joinLoading,
   leaveLoading,
 }: {
-  groups: any[],
+  groups: Group[],
   onJoin: (id: number) => void,
   onLeave: (id: number) => void,
   onViewDetails: (id: number) => void,
@@ -32,9 +46,9 @@ export default function CommunityList({
         const communityId = group.communityId || group.id;
         const communityName = group.title || group.name;
         const communityDescription = group.description;
-        const memberCount = group.additionalData.memberCount;
-        const userRole = group.additionalData.memberRole;
-        const isMember = group.additionalData.isMember;
+        const memberCount = group.additionalData?.memberCount;
+        const userRole = group.additionalData?.memberRole;
+        const isMember = group.additionalData?.isMember;
         const createdAt = group.createdAt;
         console.log(group);
         return (
